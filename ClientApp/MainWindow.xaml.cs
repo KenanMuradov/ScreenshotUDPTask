@@ -43,16 +43,18 @@ public partial class MainWindow : Window
         client.SendTo(buffer, remoteEP);
         var list = new List<byte>();
         var len = 0;
-
+        var sumBytes = 0;
         do
         {
-            var result = await client.ReceiveFromAsync(buffer, SocketFlags.None, remoteEP);
+            await Task.Delay(100);
+            var result = await client.ReceiveFromAsync(buffer,SocketFlags.None,remoteEP);
+            // len = client.ReceiveFrom(buffer, SocketFlags.None, ref remoteEP);
+
             len = result.ReceivedBytes;
 
-
             list.AddRange(buffer.Take(len));
-
-
+            
+            sumBytes += len;
         } while (len == buffer.Length);
 
 

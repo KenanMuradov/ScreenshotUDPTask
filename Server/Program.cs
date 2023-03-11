@@ -23,18 +23,23 @@ while (true)
 {
     var result = await listener.ReceiveFromAsync(buffer, SocketFlags.None, remoteEp);
 
-    Console.WriteLine("Hello");
+    
 
     var img = TakeScreenShot();
 
     var imgBuffer = ImageToByte(img);
+
+    Console.WriteLine(imgBuffer.Length);
 
     var chunk = imgBuffer.Chunk(ushort.MaxValue - 29);
 
     var newBuffer = chunk.ToArray();
 
     for (int i = 0; i < newBuffer.Length; i++)
+    {
+        await Task.Delay(100);
         listener.SendTo(newBuffer[i], result.RemoteEndPoint);
+    }
 }
 
 

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -26,7 +28,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
 
-        client = new Socket(AddressFamily.InterNetwork,SocketType.Dgram, ProtocolType.Udp);
+        client = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
 
         var ip = IPAddress.Parse("127.0.0.1");
@@ -39,12 +41,46 @@ public partial class MainWindow : Window
     {
         var buffer = new byte[ushort.MaxValue - 29];
         client.SendTo(buffer, remoteEP);
+        var list = new List<byte>();
+        var len = 0;
 
-        while (true)
+        do
         {
-            var len =  await client.ReceiveFromAsync(buffer, SocketFlags.None, remoteEP);
+            var result = await client.ReceiveFromAsync(buffer, SocketFlags.None, remoteEP);
+            len = result.ReceivedBytes;
 
 
-        }
+            list.AddRange(buffer.Take(len));
+
+
+        } while (len == buffer.Length);
+
+
+
+            var image = LoadImage(list.ToArray());
+            Img.Source = image;
+
     }
+
+
+
+    private static BitmapImage? LoadImage(byte[] imageData)
+    {
+        if (imageData == null || imageData.Length == 0) return null;
+        var image = new BitmapImage();
+        using (var mem = new MemoryStream(imageData))
+        {
+            mem.Position = 0;
+            image.BeginInit();
+            image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+            image.CacheOption = BitmapCacheOption.OnLoad;
+            image.UriSource = null;
+            image.StreamSource = mem;
+            image.EndInit();
+        }
+        image.Freeze();
+        return image;
+    }
+
+
 }

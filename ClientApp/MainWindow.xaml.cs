@@ -40,32 +40,36 @@ public partial class MainWindow : Window
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
         var buffer = new byte[ushort.MaxValue - 29];
-        client.SendTo(buffer, remoteEP);
+        await client.SendToAsync(buffer, SocketFlags.None, remoteEP);
         var list = new List<byte>();
         var len = 0;
         do
         {
-            var result = await client.ReceiveFromAsync(buffer,SocketFlags.None,remoteEP);
-
-            len = result.ReceivedBytes;
-
-            list.AddRange(buffer.Take(len));
-
+            SocketReceiveFromResult result = default;
             try
             {
-                var image = LoadImage(list.ToArray());
-                Img.Source = image;
+                result = await client.ReceiveFromAsync(buffer, SocketFlags.None, remoteEP);
+                len = result.ReceivedBytes;
+
+                list.AddRange(buffer.Take(len));
+
+                try
+                {
+                    var image = LoadImage(list.ToArray());
+                    if (image != null)
+                        Img.Source = image;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
+                }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Server is not running");
             }
 
         } while (len == buffer.Length);
-
-
-        
-            
 
     }
 

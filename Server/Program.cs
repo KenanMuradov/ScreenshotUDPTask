@@ -23,8 +23,6 @@ while (true)
 {
     var result = await listener.ReceiveFromAsync(buffer, SocketFlags.None, remoteEp);
 
-    
-
     var img = TakeScreenShot();
 
     var imgBuffer = ImageToByte(img);
@@ -37,8 +35,8 @@ while (true)
 
     for (int i = 0; i < newBuffer.Length; i++)
     {
-        await Task.Delay(100);
-        listener.SendTo(newBuffer[i], result.RemoteEndPoint);
+        await Task.Delay(50);
+        await listener.SendToAsync(newBuffer[i],SocketFlags.None, result.RemoteEndPoint);
     }
 }
 

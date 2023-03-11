@@ -46,9 +46,8 @@ public partial class MainWindow : Window
         var sumBytes = 0;
         do
         {
-            await Task.Delay(100);
+            await Task.Delay(50);
             var result = await client.ReceiveFromAsync(buffer,SocketFlags.None,remoteEP);
-            // len = client.ReceiveFrom(buffer, SocketFlags.None, ref remoteEP);
 
             len = result.ReceivedBytes;
 
@@ -58,9 +57,16 @@ public partial class MainWindow : Window
         } while (len == buffer.Length);
 
 
-
+        try
+        {
             var image = LoadImage(list.ToArray());
             Img.Source = image;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message);
+        }
+            
 
     }
 

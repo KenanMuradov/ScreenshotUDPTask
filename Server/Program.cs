@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Net.Sockets;
 using System.Net;
-using System.Windows;
+using System.Windows.Forms;
 
 var listener = new Socket(AddressFamily.InterNetwork,
     SocketType.Dgram,
@@ -16,8 +16,8 @@ var ep = new IPEndPoint(ip, port);
 listener.Bind(ep);
 
 
-EndPoint remoteEp = new IPEndPoint(IPAddress.Any, 0);
 
+EndPoint remoteEp = new IPEndPoint(IPAddress.Any, 0);
 
 while (true)
 {
@@ -56,7 +56,10 @@ byte[] ImageToByte(Image img)
 Image TakeScreenShot()
 {
     Bitmap memoryImage;
-    memoryImage = new Bitmap(1920, 1080);
+    var width = Screen.PrimaryScreen.Bounds.Width;
+    var height = Screen.PrimaryScreen.Bounds.Height;
+
+    memoryImage = new Bitmap(width, height);
 
     Graphics memoryGraphics = Graphics.FromImage(memoryImage);
     memoryGraphics.CopyFromScreen(0, 0, 0, 0, memoryImage.Size);
